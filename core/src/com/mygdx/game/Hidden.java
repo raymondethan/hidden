@@ -119,8 +119,9 @@ public class Hidden extends ApplicationAdapter {
         player.update(1, touchpad.getKnobPercentX(), touchpad.getKnobPercentY());
 
         if (fireBtn.isPressed()) {
-            player.shoot();
-            shootSound.play();
+            if (player.shoot()) {
+                shootSound.play();
+            }
         }
 
         if (start) {

@@ -46,9 +46,13 @@ public class Player extends GameObject {
         this.shapeRenderer = shapeRenderer;
     }
 
-    public void shoot() {
-        if(bullets.size() == MAX_BULLETS) return;
-        bullets.add(new Bullet(blockSprite.getX(), blockSprite.getY(), lastNonZeroDx, lastNonZeroDy));
+    public boolean shoot() {
+        if(bullets.size() == MAX_BULLETS) {
+            return false;
+        } else {
+            bullets.add(new Bullet(blockSprite.getX(), blockSprite.getY(), lastNonZeroDx, lastNonZeroDy));
+            return true;
+        }
     }
 
     public void update(float dt, float knobPercentX, float knobPercentY) {
