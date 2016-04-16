@@ -5,8 +5,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class Bullet extends GameObject {
 
-    private float game_width = Gdx.graphics.getWidth();
-    private float game_height = Gdx.graphics.getHeight();
+    private final float GAME_WIDTH = Gdx.graphics.getWidth();
+    private final float GAME_HEIGHT = Gdx.graphics.getHeight();
 
     private double xPercent;
     private double yPercent;
@@ -27,13 +27,13 @@ public class Bullet extends GameObject {
         width = height = 10;
     }
 
-    public boolean shouldRemove() { return this.x > game_width || this.y > game_height || this.x < 0 || this.y < 0; }
+    public boolean shouldRemove() { return this.x > GAME_WIDTH || this.y > GAME_HEIGHT || this.x < 0 || this.y < 0; }
 
     protected void wrap() {
-        if(x < 0) x = game_width;
-        if(x > game_width) x = 0;
-        if(y < 0) y = game_height;
-        if(y > game_height) y = 0;
+        if(x < 0) x = GAME_WIDTH;
+        if(x > GAME_WIDTH) x = 0;
+        if(y < 0) y = GAME_HEIGHT;
+        if(y > GAME_HEIGHT) y = 0;
     }
 
     public void update(float dt) {

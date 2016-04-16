@@ -18,7 +18,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
 import java.util.ArrayList;
 
-
 public class Hidden extends ApplicationAdapter {
 	SpriteBatch batch;
 	Texture img;
@@ -92,6 +91,7 @@ public class Hidden extends ApplicationAdapter {
         fireBtnStyle.down = fireSkin.getDrawable("btnpressed");
         fireBtn = new ImageButton(fireBtnStyle);
         fireBtn.setBounds(Gdx.graphics.getWidth() - 150, 50, 100, 100);
+        fireSkin.dispose();
 
         //Create a Stage and add TouchPad
         stage = new Stage();
@@ -127,16 +127,15 @@ public class Hidden extends ApplicationAdapter {
 
         if (start) {
             //Draw splash screen
-            batch = new SpriteBatch();
             batch.begin();
             batch.draw(ttrSplash, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             batch.end();
             stage.draw();
             if (Gdx.input.isTouched()) {
                 start = false;
+                ttrSplash.dispose();
             }
         } else {
-
             //Draw
             batch.begin();
             player.blockSprite.draw(batch);
@@ -162,6 +161,11 @@ public class Hidden extends ApplicationAdapter {
         shootSound.dispose();
         hitSound.dispose();
         damageSound.dispose();
+        ttrSplash.dispose();
+        stage.dispose();
+        batch.dispose();
+        shapeRenderer.dispose();
+        touchpadSkin.dispose();
     }
 
     @Override

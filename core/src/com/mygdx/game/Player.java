@@ -14,17 +14,15 @@ public class Player extends GameObject {
     private final int MAX_BULLETS = 4;
     public ArrayList<Bullet> bullets;
 
-    private boolean up;
-
-    private float game_width = Gdx.graphics.getWidth();
-    private float game_height = Gdx.graphics.getHeight();
+    private final float GAME_WIDTH = Gdx.graphics.getWidth();
+    private final float GAME_HEIGHT = Gdx.graphics.getHeight();
 
     public Texture blockTexture;
     public Sprite blockSprite;
     public float blockSpeed;
 
-    private float lastNonZeroDx = (float) .5;
-    private float lastNonZeroDy = (float) .5;
+    private float lastNonZeroDx = .5f;
+    private float lastNonZeroDy = .5f;
 
     private ShapeRenderer shapeRenderer;
 
@@ -39,7 +37,7 @@ public class Player extends GameObject {
         blockTexture = new Texture(Gdx.files.internal("block.png"));
         blockSprite = new Sprite(blockTexture);
         //Set position to centre of the screen
-        blockSprite.setPosition(game_width / 2 - blockSprite.getWidth() / 2, game_height / 2 - blockSprite.getHeight() / 2);
+        blockSprite.setPosition(GAME_WIDTH / 2 - blockSprite.getWidth() / 2, GAME_HEIGHT / 2 - blockSprite.getHeight() / 2);
 
         blockSpeed = 5;
 
@@ -57,13 +55,13 @@ public class Player extends GameObject {
         blockSprite.setY(blockSprite.getY() + knobPercentY * blockSpeed);
         if (blockSprite.getX() < 0) {
             blockSprite.setX(0);
-        } else if (blockSprite.getX() > game_width - blockTexture.getWidth()) {
-            blockSprite.setX(game_width - blockTexture.getWidth());
+        } else if (blockSprite.getX() > GAME_WIDTH - blockTexture.getWidth()) {
+            blockSprite.setX(GAME_WIDTH - blockTexture.getWidth());
         }
         if (blockSprite.getY() < 0) {
             blockSprite.setY(0);
-        } else if (blockSprite.getY() > game_height - blockTexture.getHeight()) {
-            blockSprite.setY(game_height - blockTexture.getHeight());
+        } else if (blockSprite.getY() > GAME_HEIGHT - blockTexture.getHeight()) {
+            blockSprite.setY(GAME_HEIGHT - blockTexture.getHeight());
         }
 
         if (0 != knobPercentX && 0 != knobPercentY) {
