@@ -45,6 +45,9 @@ public class Hidden extends ApplicationAdapter {
     private boolean start = true;
     private Texture ttrSplash;
 
+    //Variable to slow down fire rate
+    int presses;
+
 	@Override
 	public void create () {
         bgMusic = Gdx.audio.newMusic(Gdx.files.internal("mus_bg.ogg"));
@@ -92,13 +95,12 @@ public class Hidden extends ApplicationAdapter {
         fireBtn = new ImageButton(fireBtnStyle);
         fireBtn.setBounds(Gdx.graphics.getWidth() - 150, 50, 100, 100);
         fireSkin.dispose();
+        presses = 0;
 
         //Create a Stage and add TouchPad
         stage = new Stage();
         //Use batch????????
         stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
-        stage.addActor(touchpad);
-        stage.addActor(fireBtn);
         Gdx.input.setInputProcessor(stage);
 
         //Create block sprite
@@ -120,9 +122,13 @@ public class Hidden extends ApplicationAdapter {
         //Move blockSprite with TouchPad
         player.update(1, touchpad.getKnobPercentX(), touchpad.getKnobPercentY());
 
-        if (fireBtn.isPressed()) {
-            player.shoot();
-            shootSound.play();
+        if (fireBtn.isPressed() && presses <= 0) {
+            if (player.shoot()) {
+                shootSound.play();
+            }
+            presses = 5;
+        } else {
+            presses--;
         }
 
         if (start) {
@@ -136,6 +142,9 @@ public class Hidden extends ApplicationAdapter {
                 ttrSplash.dispose();
             }
         } else {
+            //Add actors
+            stage.addActor(touchpad);
+            stage.addActor(fireBtn);
             //Draw
             batch.begin();
             player.blockSprite.draw(batch);
