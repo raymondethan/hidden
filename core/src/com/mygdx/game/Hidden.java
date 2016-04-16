@@ -229,7 +229,7 @@ public class Hidden extends ApplicationAdapter {
         camera.update();
 
         //Move blockSprite with TouchPad
-        player.update(1, touchpad.getKnobPercentX(), touchpad.getKnobPercentY());
+        player.update(1, touchpad.getKnobPercentX(), touchpad.getKnobPercentY(), touchpad.isTouched());
 
 
         if (fireBtn.isPressed()) {

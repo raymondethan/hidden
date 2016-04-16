@@ -30,13 +30,18 @@ public class Player extends GameObject {
     double shiftx = 0;
     double shifty = 0;
 
+    float spriteRotation;
+    float inputRotation;
+
     public Player(ArrayList<Bullet> bullets, ShapeRenderer shapeRenderer) {
 
         this.bullets = bullets;
 
         //Create block sprite
-        blockTexture = new Texture(Gdx.files.internal("block.png"));
+        blockTexture = new Texture(Gdx.files.internal("spaceShip.png"));
         blockSprite = new Sprite(blockTexture);
+        blockSprite.scale(6);
+        blockSprite.setCenter(8, 8);
         //Set position to centre of the screen
         blockSprite.setPosition(GAME_WIDTH / 2 - blockSprite.getWidth() / 2, GAME_HEIGHT / 2 - blockSprite.getHeight() / 2);
 
@@ -54,10 +59,18 @@ public class Player extends GameObject {
         }
     }
 
-    public void update(float dt, float knobPercentX, float knobPercentY) {
+    public void update(float dt, float knobPercentX, float knobPercentY, boolean isTouched) {
 
         blockSprite.setX(blockSprite.getX() + knobPercentX * blockSpeed);
         blockSprite.setY(blockSprite.getY() + knobPercentY * blockSpeed);
+
+        if (isTouched) {
+            spriteRotation = blockSprite.getRotation();
+            inputRotation = (float) Math.toDegrees(Math.atan2(knobPercentY, knobPercentX));
+
+            blockSprite.rotate(inputRotation - spriteRotation - 90);
+        }
+
         if (blockSprite.getX() < 0) {
             blockSprite.setX(0);
         } else if (blockSprite.getX() > GAME_WIDTH - blockTexture.getWidth()) {
