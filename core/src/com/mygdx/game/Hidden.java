@@ -97,8 +97,6 @@ public class Hidden extends ApplicationAdapter {
         stage = new Stage();
         //Use batch????????
         stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
-        stage.addActor(touchpad);
-        stage.addActor(fireBtn);
         Gdx.input.setInputProcessor(stage);
 
         //Create block sprite
@@ -136,7 +134,9 @@ public class Hidden extends ApplicationAdapter {
                 start = false;
             }
         } else {
-
+            //Add actors
+            stage.addActor(touchpad);
+            stage.addActor(fireBtn);
             //Draw
             batch.begin();
             player.blockSprite.draw(batch);
