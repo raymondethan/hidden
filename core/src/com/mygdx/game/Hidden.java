@@ -49,6 +49,9 @@ public class Hidden extends ApplicationAdapter {
     private Sound damageSound;
     private Sound hitSound;
 
+    private boolean start = true;
+    private Texture ttrSplash;
+
 	@Override
 	public void create () {
         bgMusic = Gdx.audio.newMusic(Gdx.files.internal("mus_bg.ogg"));
@@ -58,6 +61,8 @@ public class Hidden extends ApplicationAdapter {
 
         shapeRenderer = new ShapeRenderer();
 		batch = new SpriteBatch();
+
+        ttrSplash = new Texture("splash-screen.png");
 
         //Create camera
         float aspectRatio = (float) Gdx.graphics.getWidth() / (float) Gdx.graphics.getHeight();
@@ -132,22 +137,36 @@ public class Hidden extends ApplicationAdapter {
             shootSound.play();
         }
 
-        //Draw
-        batch.begin();
-        player.blockSprite.draw(batch);
-        batch.end();
-        // update player bullets
-        for(int i = 0; i < player.bullets.size(); i++) {
-            player.bullets.get(i).update(1);
-            player.bullets.get(i).draw(shapeRenderer);
-            if(player.bullets.get(i).shouldRemove()) {
-                player.bullets.remove(i);
-                i--;
+        if (start) {
+            //Draw splash screen
+            batch = new SpriteBatch();
+            batch.begin();
+            batch.draw(ttrSplash, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            batch.end();
+            stage.draw();
+            if (Gdx.input.isTouched()) {
+                start = false;
             }
+        } else {
+
+            //Draw
+            batch.begin();
+            player.blockSprite.draw(batch);
+            batch.end();
+            // update player bullets
+            for (int i = 0; i < player.bullets.size(); i++) {
+                player.bullets.get(i).update(1);
+                player.bullets.get(i).draw(shapeRenderer);
+                if (player.bullets.get(i).shouldRemove()) {
+                    player.bullets.remove(i);
+                    i--;
+                }
+            }
+            stage.act(Gdx.graphics.getDeltaTime());
+            stage.draw();
+
         }
-        stage.act(Gdx.graphics.getDeltaTime());
-        stage.draw();
-	}
+    }
 
     @Override
     public void dispose() {
