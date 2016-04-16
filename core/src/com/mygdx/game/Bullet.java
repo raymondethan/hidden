@@ -16,23 +16,27 @@ public class Bullet extends GameObject {
 
     private boolean remove;
 
-    public Bullet(float x, float y, float radians, float speed) {
+    private float xPercent;
+    private float yPercent;
+    private double speed = 5;
+
+    public Bullet(float x, float y, float knobPercentX, float knobPercentY) {
 
         this.x = x;
         this.y = y;
-        this.radians = radians;
+        this.xPercent = knobPercentX;
+        this.yPercent = knobPercentY;
+        this.speed = 1.5 * speed;
 
-        dx = MathUtils.cos(radians) * speed;
-        dy = MathUtils.sin(radians) * speed;
 
-        width = height = 2;
+        width = height = 10;
 
-        lifeTimer = 0;
-        lifeTime = 1;
+//        lifeTimer = 0;
+//        lifeTime = 500;
 
     }
 
-    public boolean shouldRemove() { return remove; }
+    public boolean shouldRemove() { return this.x > game_width || this.y > game_height || this.x < 0 || this.y < 0; }
 
     protected void wrap() {
         if(x < 0) x = game_width;
@@ -43,15 +47,19 @@ public class Bullet extends GameObject {
 
     public void update(float dt) {
 
-        x += dx * dt;
-        y += dy * dt;
+        x += xPercent * speed;
+        y += yPercent * speed;
 
-        wrap();
+//        System.out.println("--------------------------------- X PERCENT: " + xPercent);
+//        System.out.println("--------------------------------- Y PERCENT: " + yPercent);
+//        System.out.println(speed);
 
-        lifeTimer += dt;
-        if(lifeTimer > lifeTime) {
-            remove = true;
-        }
+        //wrap();
+
+//        lifeTimer += dt;
+//        if(lifeTimer > lifeTime) {
+//            remove = true;
+//        }
 
     }
 

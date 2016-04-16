@@ -34,6 +34,9 @@ public class Player extends GameObject {
     public Sprite blockSprite;
     public float blockSpeed;
 
+    private float lastNonZeroDx = (float) .5;
+    private float lastNonZeroDy = (float) .5;
+
     public Player(ArrayList<Bullet> bullets) {
 
         this.bullets = bullets;
@@ -96,57 +99,24 @@ public class Player extends GameObject {
 
     public void shoot() {
         if(bullets.size() == MAX_BULLETS) return;
-        bullets.add(new Bullet(x, y, radians, blockSpeed));
+        bullets.add(new Bullet(blockSprite.getX(), blockSprite.getY(), lastNonZeroDx, lastNonZeroDy));
     }
 
-    public void update(float dt) {
+    public void update(float dt, float knobPercentX, float knobPercentY) {
 
-        // turning
-        if(left) {
-            radians += rotationSpeed * dt;
-        }
-        else if(right) {
-            radians -= rotationSpeed * dt;
-        }
+        blockSprite.setX(blockSprite.getX() + knobPercentX * blockSpeed);
+        blockSprite.setY(blockSprite.getY() + knobPercentY * blockSpeed);
 
-        // accelerating
-        if(up) {
-            dx += MathUtils.cos(radians) * acceleration * dt;
-            dy += MathUtils.sin(radians) * acceleration * dt;
-            acceleratingTimer += dt;
-            if(acceleratingTimer > 0.1f) {
-                acceleratingTimer = 0;
-            }
-        }
-        else {
-            acceleratingTimer = 0;
+        if (0 != knobPercentX && 0 != knobPercentY) {
+            lastNonZeroDx = knobPercentX;
+            lastNonZeroDy = knobPercentY;
         }
 
-        // deceleration
-        float vec = (float) Math.sqrt(dx * dx + dy * dy);
-        if(vec > 0) {
-            dx -= (dx / vec) * deceleration * dt;
-            dy -= (dy / vec) * deceleration * dt;
-        }
-        if(vec > maxSpeed) {
-            dx = (dx / vec) * maxSpeed;
-            dy = (dy / vec) * maxSpeed;
-        }
-
-        // set position
-        x += dx * dt;
-        y += dy * dt;
-
-        // set shape
-        setShape();
-
-        // set flame
-        if(up) {
-            setFlame();
-        }
+//        System.out.println("--------------------------------- X PERCENT: " + lastNonZeroDx);
+//        System.out.println("--------------------------------- Y PERCENT: " + lastNonZeroDy);
 
         // screen wrap
-        wrap();
+        //wrap();
 
     }
 
