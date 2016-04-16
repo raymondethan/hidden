@@ -139,85 +139,85 @@ public class Hidden extends ApplicationAdapter {
 //        // Keep in mind, there can be multiple interfaces per device, for example
 //        // one per NIC, one per active wireless and the loopback
 //        // In this case we only care about IPv4 address ( x.x.x.x format )
-//        List<String> addresses = new ArrayList<String>();
-//        try {
-//            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-//            for(NetworkInterface ni : Collections.list(interfaces)){
-//                for(InetAddress address : Collections.list(ni.getInetAddresses()))
-//                {
-//                    if(address instanceof Inet4Address){
-//                        addresses.add(address.getHostAddress());
-//                    }
-//                }
-//            }
-//        } catch (SocketException e) {
-//            e.printStackTrace();
+        List<String> addresses = new ArrayList<String>();
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            for(NetworkInterface ni : Collections.list(interfaces)){
+                for(InetAddress address : Collections.list(ni.getInetAddresses()))
+                {
+                    if(address instanceof Inet4Address){
+                        addresses.add(address.getHostAddress());
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+
+        // Print the contents of our array to a string.  Yeah, should have used StringBuilder
+        for(String str:addresses)
+        {
+            if (str.startsWith("10")) {
+                this.ipAddress = str;
+            }
+        }
+        System.out.println("addr: " + ipAddress);
+
+        // Socket will time our in 4 seconds
+        socketHints.connectTimeout = 4000;
+
+        // Now we create a thread that will listen for incoming socket connections
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                ServerSocketHints serverSocketHint = new ServerSocketHints();
+                // 0 means no timeout.  Probably not the greatest idea in production!
+                serverSocketHint.acceptTimeout = 0;
+
+                // Create the socket server using TCP protocol and listening on 9021
+                // Only one app can listen to a port at a time, keep in mind many ports are reserved
+                // especially in the lower numbers ( like 21, 80, etc )
+                ServerSocket serverSocket = Gdx.net.newServerSocket(Net.Protocol.TCP, 9021, serverSocketHint);
+
+                // Loop forever
+                while(true) {
+                    // Create a socket
+                    Socket socket = serverSocket.accept(null);
+
+                    // Read data from the socket into a BufferedReader
+                    BufferedReader buffer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+                    if (null != buffer) {
+
+                        try {
+                            // Read to the next newline (\n) and display that text on labelMessage
+                            System.out.println("butter: " + buffer);
+                            String[] data = buffer.readLine().split(",");
+                            System.out.println("data" + data.toString());
+                            System.out.println(Float.parseFloat(data[0]));
+                            System.out.println(Float.parseFloat(data[1]));
+                            if (players.size() == 1) {
+                                Player p = new Player(new ArrayList<Bullet>(), shapeRenderer);
+                                System.out.println("Player: " + p);
+                                p.setPosition(Float.parseFloat(data[0]), Float.parseFloat(data[1]));
+                                players.add(p);
+                            } else {
+                                players.get(1).setPosition(Float.parseFloat(data[0]), Float.parseFloat(data[1]));
+                            }
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }).start(); // And, start the thread running
+
+        //create the socket and connect to the server entered in the text box ( x.x.x.x format ) on port 9021
+//        if (!this.ipAddress.equals("10.89.37.19")) {
+//            socket = Gdx.net.newClientSocket(Net.Protocol.TCP, "10.89.37.19", 9021, socketHints);
 //        }
-//
-//        // Print the contents of our array to a string.  Yeah, should have used StringBuilder
-//        for(String str:addresses)
-//        {
-//            if (str.startsWith("10")) {
-//                this.ipAddress = str;
-//            }
-//        }
-//        System.out.println("adddr: " + ipAddress);
-//
-//        // Socket will time our in 4 seconds
-//        socketHints.connectTimeout = 4000;
-//
-//        // Now we create a thread that will listen for incoming socket connections
-//        new Thread(new Runnable(){
-//
-//            @Override
-//            public void run() {
-//                ServerSocketHints serverSocketHint = new ServerSocketHints();
-//                // 0 means no timeout.  Probably not the greatest idea in production!
-//                serverSocketHint.acceptTimeout = 0;
-//
-//                // Create the socket server using TCP protocol and listening on 9021
-//                // Only one app can listen to a port at a time, keep in mind many ports are reserved
-//                // especially in the lower numbers ( like 21, 80, etc )
-//                ServerSocket serverSocket = Gdx.net.newServerSocket(Net.Protocol.TCP, 9021, serverSocketHint);
-//
-//                // Loop forever
-//                while(true){
-//                    // Create a socket
-//                    Socket socket = serverSocket.accept(null);
-//
-//                    // Read data from the socket into a BufferedReader
-//                    BufferedReader buffer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//
-//                    if (null != buffer) {
-//
-//                        try {
-//                            // Read to the next newline (\n) and display that text on labelMessage
-//                            System.out.println("butter: " + buffer);
-//                            String[] data = buffer.readLine().split(",");
-//                            System.out.println("data" + data.toString());
-//                            System.out.println(Float.parseFloat(data[0]));
-//                            System.out.println(Float.parseFloat(data[1]));
-//                            if (players.size() == 1) {
-//                                Player p = new Player(new ArrayList<Bullet>(), shapeRenderer);
-//                                System.out.println("Player: " + p);
-//                                p.setPosition(Float.parseFloat(data[0]), Float.parseFloat(data[1]));
-//                                players.add(p);
-//                            } else {
-//                                players.get(1).setPosition(Float.parseFloat(data[0]), Float.parseFloat(data[1]));
-//                            }
-//
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                }
-//            }
-//        }).start(); // And, start the thread running
-//
-//        //create the socket and connect to the server entered in the text box ( x.x.x.x format ) on port 9021
-////        if (!this.ipAddress.equals("10.89.37.19")) {
-////            socket = Gdx.net.newClientSocket(Net.Protocol.TCP, "10.89.37.19", 9021, socketHints);
-////        }
 
 	}
 
@@ -276,18 +276,18 @@ public class Hidden extends ApplicationAdapter {
             stage.draw();
 
         }
-    //        if (!"10.89.37.19".equals(this.ipAddress)) {
-    //
-    //            Socket socket = Gdx.net.newClientSocket(Net.Protocol.TCP, "10.89.37.19", 9021, socketHints);
-    //            System.out.println(player.blockSprite.getX());
-    //            System.out.println(player.blockSprite.getY());
-    //
-    //            try {
-    //                // write our entered message to the stream
-    //                socket.getOutputStream().write((player.blockSprite.getX() + "," + player.blockSprite.getY()).getBytes());
-    //            } catch (IOException e) {
-    //                e.printStackTrace();
-    //            }
+            if (!"10.89.37.19".equals(this.ipAddress)) {
+
+                Socket socket = Gdx.net.newClientSocket(Net.Protocol.TCP, "10.89.37.19", 9021, socketHints);
+                System.out.println(player.blockSprite.getX());
+                System.out.println(player.blockSprite.getY());
+
+                try {
+                    // write our entered message to the stream
+                    socket.getOutputStream().write((player.blockSprite.getX() + "," + player.blockSprite.getY()).getBytes());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
         }
     }
 
@@ -314,6 +314,34 @@ public class Hidden extends ApplicationAdapter {
 
     @Override
     public void resize(int width, int height) {
+    }
+
+    //Should be in a separate class, but whatever
+    public static String getIPAddress(boolean useIPv4) {
+        try {
+            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface intf : interfaces) {
+                List<InetAddress> addrs = Collections.list(intf.getInetAddresses());
+                for (InetAddress addr : addrs) {
+                    if (!addr.isLoopbackAddress()) {
+                        String sAddr = addr.getHostAddress();
+                        //boolean isIPv4 = InetAddressUtils.isIPv4Address(sAddr);
+                        boolean isIPv4 = sAddr.indexOf(':')<0;
+
+                        if (useIPv4) {
+                            if (isIPv4)
+                                return sAddr;
+                        } else {
+                            if (!isIPv4) {
+                                int delim = sAddr.indexOf('%'); // drop ip6 zone suffix
+                                return delim<0 ? sAddr.toUpperCase() : sAddr.substring(0, delim).toUpperCase();
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception ex) { } // for now eat exceptions
+        return "";
     }
 
 }
