@@ -9,12 +9,18 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.mygdx.game.Player;
+import com.mygdx.game.Bullet;
+
+import java.util.ArrayList;
 
 
 public class Hidden extends ApplicationAdapter {
@@ -25,12 +31,16 @@ public class Hidden extends ApplicationAdapter {
     private OrthographicCamera camera;
     private Stage stage;
     private Touchpad.TouchpadStyle touchpadStyle;
+    private Skin fireSkin;
     private Skin touchpadSkin;
     private Drawable touchBackground;
     private Drawable touchKnob;
-    private Texture blockTexture;
-    private Sprite blockSprite;
-    private float blockSpeed;
+    private Player player;
+    private TextureAtlas buttonAtlas;
+
+    //fire button
+    private ImageButton fireBtn;
+    private ImageButton.ImageButtonStyle fireBtnStyle;
 	
 	@Override
 	public void create () {
@@ -40,14 +50,11 @@ public class Hidden extends ApplicationAdapter {
         //Create camera
         float aspectRatio = (float) Gdx.graphics.getWidth() / (float) Gdx.graphics.getHeight();
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 10f*aspectRatio, 10f);
+        camera.setToOrtho(false, 10f * aspectRatio, 10f);
 
         //Create a touchpad skin
         touchpadSkin = new Skin();
         //Set background image
-        //FileHandle files = Gdx.files.internal("touchBackground.png");
-        //System.out.println(files.toString());
-        img = new Texture("badlogic.jpg");
         touchpadSkin.add("touchBackground", new Texture("touchBackground.png"));
         //Set knob image
         touchpadSkin.add("touchKnob", new Texture("touchKnob.png"));
@@ -62,23 +69,30 @@ public class Hidden extends ApplicationAdapter {
         //Create new TouchPad with the created style
         touchpad = new Touchpad(10, touchpadStyle);
         //setBounds(x,y,width,height)
-        touchpad.setBounds(15, 15, 200, 200);
+        touchpad.setBounds(15, 15, 250, 250);
+
+        //Fire button
+        fireSkin = new Skin();
+        //fireSkin.add("fireButton", new Texture("btnunpressed.png"));
+        buttonAtlas = new TextureAtlas(Gdx.files.internal("fire.atlas"));
+        fireSkin.addRegions(buttonAtlas);
+        fireBtnStyle = new ImageButton.ImageButtonStyle();
+        fireBtnStyle.up = fireSkin.getDrawable("btnunpressed");
+        fireBtnStyle.down = fireSkin.getDrawable("btnpressed");
+        fireBtn = new ImageButton(fireBtnStyle);
+        fireBtn.setBounds(Gdx.graphics.getWidth() - 150, 50, 100, 100);
 
         //Create a Stage and add TouchPad
-        //stage = new Stage(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true, batch);
         stage = new Stage();
         //Use batch????????
         stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
         stage.addActor(touchpad);
+        stage.addActor(fireBtn);
         Gdx.input.setInputProcessor(stage);
 
         //Create block sprite
-        blockTexture = new Texture(Gdx.files.internal("block.png"));
-        blockSprite = new Sprite(blockTexture);
-        //Set position to centre of the screen
-        blockSprite.setPosition(Gdx.graphics.getWidth()/2-blockSprite.getWidth()/2, Gdx.graphics.getHeight()/2-blockSprite.getHeight()/2);
-
-        blockSpeed = 5;
+        ArrayList<Bullet> bullets = new ArrayList<Bullet>();
+        player = new Player(bullets);
 	}
 
     @Override
@@ -95,13 +109,25 @@ public class Hidden extends ApplicationAdapter {
         camera.update();
 
         //Move blockSprite with TouchPad
-        blockSprite.setX(blockSprite.getX() + touchpad.getKnobPercentX()*blockSpeed);
-        blockSprite.setY(blockSprite.getY() + touchpad.getKnobPercentY()*blockSpeed);
+        player.blockSprite.setX(player.blockSprite.getX() + touchpad.getKnobPercentX() * player.blockSpeed);
+        player.blockSprite.setY(player.blockSprite.getY() + touchpad.getKnobPercentY() * player.blockSpeed);
+        if (fireBtn.isPressed()) {
+            player.shoot();
+        }
 
         //Draw
         batch.begin();
-        blockSprite.draw(batch);
+        player.blockSprite.draw(batch);
         batch.end();
+        // update player bullets
+        for(int i = 0; i < player.bullets.size(); i++) {
+            player.bullets.get(i).update(1);
+            player.bullets.get(i).draw(shapeRenderer);
+            if(player.bullets.get(i).shouldRemove()) {
+                player.bullets.remove(i);
+                i--;
+            }
+        }
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
 	}
