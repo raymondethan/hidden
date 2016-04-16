@@ -2,6 +2,8 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -41,11 +43,26 @@ public class Hidden extends ApplicationAdapter {
     //fire button
     private ImageButton fireBtn;
     private ImageButton.ImageButtonStyle fireBtnStyle;
-	
+
+    private Music bgMusic;
+    private Sound shootSound;
+    private Sound damageSound;
+    private Sound hitSound;
+
+    private boolean start = true;
+    private Texture ttrSplash;
+
 	@Override
 	public void create () {
-		shapeRenderer = new ShapeRenderer();
+        bgMusic = Gdx.audio.newMusic(Gdx.files.internal("mus_bg.ogg"));
+        shootSound = Gdx.audio.newSound(Gdx.files.internal("mus_lazer.ogg"));
+        damageSound = Gdx.audio.newSound(Gdx.files.internal("mus_damage.ogg"));
+        hitSound = Gdx.audio.newSound(Gdx.files.internal("mus_hit.ogg"));
+
+        shapeRenderer = new ShapeRenderer();
 		batch = new SpriteBatch();
+
+        ttrSplash = new Texture("splash-screen.png");
 
         //Create camera
         float aspectRatio = (float) Gdx.graphics.getWidth() / (float) Gdx.graphics.getHeight();
@@ -93,6 +110,10 @@ public class Hidden extends ApplicationAdapter {
         //Create block sprite
         ArrayList<Bullet> bullets = new ArrayList<Bullet>();
         player = new Player(bullets);
+
+        //Play music
+        bgMusic.setLooping(true);
+        bgMusic.play();
 	}
 
     @Override
@@ -113,28 +134,46 @@ public class Hidden extends ApplicationAdapter {
 
         if (fireBtn.isPressed()) {
             player.shoot();
+            shootSound.play();
         }
 
-        //Draw
-        batch.begin();
-        player.blockSprite.draw(batch);
-        batch.end();
-        // update player bullets
-        for(int i = 0; i < player.bullets.size(); i++) {
-            player.bullets.get(i).update(1);
-            player.bullets.get(i).draw(shapeRenderer);
-            if(player.bullets.get(i).shouldRemove()) {
-                player.bullets.remove(i);
-                i--;
+        if (start) {
+            //Draw splash screen
+            batch = new SpriteBatch();
+            batch.begin();
+            batch.draw(ttrSplash, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            batch.end();
+            stage.draw();
+            if (Gdx.input.isTouched()) {
+                start = false;
             }
+        } else {
+
+            //Draw
+            batch.begin();
+            player.blockSprite.draw(batch);
+            batch.end();
+            // update player bullets
+            for (int i = 0; i < player.bullets.size(); i++) {
+                player.bullets.get(i).update(1);
+                player.bullets.get(i).draw(shapeRenderer);
+                if (player.bullets.get(i).shouldRemove()) {
+                    player.bullets.remove(i);
+                    i--;
+                }
+            }
+            stage.act(Gdx.graphics.getDeltaTime());
+            stage.draw();
+
         }
-        stage.act(Gdx.graphics.getDeltaTime());
-        stage.draw();
-	}
+    }
 
     @Override
     public void dispose() {
-
+        bgMusic.dispose();
+        shootSound.dispose();
+        hitSound.dispose();
+        damageSound.dispose();
     }
 
     @Override
