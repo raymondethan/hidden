@@ -2,6 +2,8 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -41,10 +43,20 @@ public class Hidden extends ApplicationAdapter {
     //fire button
     private ImageButton fireBtn;
     private ImageButton.ImageButtonStyle fireBtnStyle;
-	
+
+    private Music bgMusic;
+    private Sound shootSound;
+    private Sound damageSound;
+    private Sound hitSound;
+
 	@Override
 	public void create () {
-		shapeRenderer = new ShapeRenderer();
+        bgMusic = Gdx.audio.newMusic(Gdx.files.internal("mus_bg.ogg"));
+        shootSound = Gdx.audio.newSound(Gdx.files.internal("mus_lazer.ogg"));
+        damageSound = Gdx.audio.newSound(Gdx.files.internal("mus_damage.ogg"));
+        hitSound = Gdx.audio.newSound(Gdx.files.internal("mus_hit.ogg"));
+
+        shapeRenderer = new ShapeRenderer();
 		batch = new SpriteBatch();
 
         //Create camera
@@ -93,6 +105,10 @@ public class Hidden extends ApplicationAdapter {
         //Create block sprite
         ArrayList<Bullet> bullets = new ArrayList<Bullet>();
         player = new Player(bullets);
+
+        //Play music
+        bgMusic.setLooping(true);
+        bgMusic.play();
 	}
 
     @Override
@@ -113,6 +129,7 @@ public class Hidden extends ApplicationAdapter {
         player.blockSprite.setY(player.blockSprite.getY() + touchpad.getKnobPercentY() * player.blockSpeed);
         if (fireBtn.isPressed()) {
             player.shoot();
+            shootSound.play();
         }
 
         //Draw
@@ -134,7 +151,10 @@ public class Hidden extends ApplicationAdapter {
 
     @Override
     public void dispose() {
-
+        bgMusic.dispose();
+        shootSound.dispose();
+        hitSound.dispose();
+        damageSound.dispose();
     }
 
     @Override
