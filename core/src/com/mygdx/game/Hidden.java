@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
 import java.util.ArrayList;
 
+
 public class Hidden extends ApplicationAdapter {
 	SpriteBatch batch;
 	Texture img;
@@ -46,7 +47,7 @@ public class Hidden extends ApplicationAdapter {
     private Texture ttrSplash;
 
     //Variable to slow down fire rate
-    int presses;
+    boolean canShoot;
 
 	@Override
 	public void create () {
@@ -94,12 +95,12 @@ public class Hidden extends ApplicationAdapter {
         fireBtnStyle.down = fireSkin.getDrawable("btnpressed");
         fireBtn = new ImageButton(fireBtnStyle);
         fireBtn.setBounds(Gdx.graphics.getWidth() - 150, 50, 100, 100);
+        canShoot = true;
         fireSkin.dispose();
-        presses = 0;
 
         //Create a Stage and add TouchPad
         stage = new Stage();
-        //Use batch????????
+        //TODO:Use batch????????
         stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
         Gdx.input.setInputProcessor(stage);
 
@@ -122,13 +123,15 @@ public class Hidden extends ApplicationAdapter {
         //Move blockSprite with TouchPad
         player.update(1, touchpad.getKnobPercentX(), touchpad.getKnobPercentY());
 
-        if (fireBtn.isPressed() && presses <= 0) {
-            if (player.shoot()) {
-                shootSound.play();
+        if (fireBtn.isPressed()) {
+            if (canShoot) {
+                if (player.shoot()) {
+                    shootSound.play();
+                }
             }
-            presses = 5;
+            canShoot = false;
         } else {
-            presses--;
+            canShoot = true;
         }
 
         if (start) {
