@@ -109,21 +109,15 @@ public class Hidden extends ApplicationAdapter {
 
         //Create block sprite
         ArrayList<Bullet> bullets = new ArrayList<Bullet>();
-        player = new Player(bullets);
+        player = new Player(bullets, shapeRenderer);
 
         //Play music
         bgMusic.setLooping(true);
-        bgMusic.play();
+        //bgMusic.play();
 	}
 
     @Override
     public void render() {
-
-		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-		shapeRenderer.circle(50, 50, 32);
-        shapeRenderer.setColor(Color.BLACK);
-		shapeRenderer.end();
-
 
         Gdx.gl.glClearColor(0.294f, 0.294f, 0.294f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -37,65 +39,28 @@ public class Player extends GameObject {
     private float lastNonZeroDx = (float) .5;
     private float lastNonZeroDy = (float) .5;
 
-    public Player(ArrayList<Bullet> bullets) {
+    private ShapeRenderer shapeRenderer;
+
+    double shiftx = 0;
+    double shifty = 0;
+
+    public Player(ArrayList<Bullet> bullets, ShapeRenderer shapeRenderer) {
 
         this.bullets = bullets;
 
-        x = game_width / 2;
-        y = game_height / 2;
-
-//        maxSpeed = 300;
-//        acceleration = 200;
-//        deceleration = 10;
-//
-//        shapex = new float[4];
-//        shapey = new float[4];
-//        flamex = new float[3];
-//        flamey = new float[3];
-//
-//        radians = 3.1415f / 2;
-//        rotationSpeed = 3;
+//        x = game_width / 2;
+//        y = game_height / 2;
 
         //Create block sprite
         blockTexture = new Texture(Gdx.files.internal("block.png"));
         blockSprite = new Sprite(blockTexture);
         //Set position to centre of the screen
-        blockSprite.setPosition(Gdx.graphics.getWidth()/2-blockSprite.getWidth()/2, Gdx.graphics.getHeight()/2-blockSprite.getHeight()/2);
+        blockSprite.setPosition(Gdx.graphics.getWidth() / 2 - blockSprite.getWidth() / 2, Gdx.graphics.getHeight() / 2 - blockSprite.getHeight() / 2);
 
         blockSpeed = 5;
 
+        this.shapeRenderer = shapeRenderer;
     }
-
-    private void setShape() {
-        shapex[0] = x + MathUtils.cos(radians) * 8;
-        shapey[0] = y + MathUtils.sin(radians) * 8;
-
-        shapex[1] = x + MathUtils.cos(radians - 4 * 3.1415f / 5) * 8;
-        shapey[1] = y + MathUtils.sin(radians - 4 * 3.1415f / 5) * 8;
-
-        shapex[2] = x + MathUtils.cos(radians + 3.1415f) * 5;
-        shapey[2] = y + MathUtils.sin(radians + 3.1415f) * 5;
-
-        shapex[3] = x + MathUtils.cos(radians + 4 * 3.1415f / 5) * 8;
-        shapey[3] = y + MathUtils.sin(radians + 4 * 3.1415f / 5) * 8;
-    }
-
-    private void setFlame() {
-        flamex[0] = x + MathUtils.cos(radians - 5 * 3.1415f / 6) * 5;
-        flamey[0] = y + MathUtils.sin(radians - 5 * 3.1415f / 6) * 5;
-
-        flamex[1] = x + MathUtils.cos(radians - 3.1415f) *
-                (6 + acceleratingTimer * 50);
-        flamey[1] = y + MathUtils.sin(radians - 3.1415f) *
-                (6 + acceleratingTimer * 50);
-
-        flamex[2] = x + MathUtils.cos(radians + 5 * 3.1415f / 6) * 5;
-        flamey[2] = y + MathUtils.sin(radians + 5 * 3.1415f / 6) * 5;
-    }
-
-    public void setLeft(boolean b) { left = b; }
-    public void setRight(boolean b) { right = b; }
-    public void setUp(boolean b) { up = b; }
 
     public void shoot() {
         if(bullets.size() == MAX_BULLETS) return;
@@ -121,10 +86,15 @@ public class Player extends GameObject {
             lastNonZeroDx = knobPercentX;
             lastNonZeroDy = knobPercentY;
         }
-        if (knobPercentX > .5 || knobPercentY > .5) {
-            System.out.println("--------------------------------- PERCENT: " + knobPercentX + ", " + knobPercentY);
+        if (Math.random() < .025) {
+            shiftx = Math.random() * 120 - 60;
+            shifty = Math.random() * 120 - 60;
         }
-        //System.out.println("--------------------------------- Y PERCENT: " + knobPercentY);
+
+        shapeRenderer.setColor(Color.RED);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.circle((float) (blockSprite.getX() + shiftx), (float) (blockSprite.getY() + shifty), 200);
+        shapeRenderer.end();
 
         // screen wrap
         //wrap();
