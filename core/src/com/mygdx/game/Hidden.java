@@ -285,6 +285,7 @@ public class Hidden extends ApplicationAdapter {
                 try {
                     // write our entered message to the stream
                     socket.getOutputStream().write((player.blockSprite.getX() + "," + player.blockSprite.getY()).getBytes());
+                    socket.getOutputStream().write((touchpad.getKnobPercentX() + "," + touchpad.getKnobPercentY()).getBytes());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
