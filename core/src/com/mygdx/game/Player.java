@@ -111,9 +111,10 @@ public class Player extends GameObject {
             lastNonZeroDx = knobPercentX;
             lastNonZeroDy = knobPercentY;
         }
-
-//        System.out.println("--------------------------------- X PERCENT: " + lastNonZeroDx);
-//        System.out.println("--------------------------------- Y PERCENT: " + lastNonZeroDy);
+        if (knobPercentX > .5 || knobPercentY > .5) {
+            System.out.println("--------------------------------- PERCENT: " + knobPercentX + ", " + knobPercentY);
+        }
+        //System.out.println("--------------------------------- Y PERCENT: " + knobPercentY);
 
         // screen wrap
         //wrap();

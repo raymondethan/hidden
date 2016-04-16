@@ -16,17 +16,21 @@ public class Bullet extends GameObject {
 
     private boolean remove;
 
-    private float xPercent;
-    private float yPercent;
-    private double speed = 5;
+    private double xPercent;
+    private double yPercent;
+    private double speed = 10;
+    private double angle;
 
     public Bullet(float x, float y, float knobPercentX, float knobPercentY) {
 
         this.x = x;
         this.y = y;
-        this.xPercent = knobPercentX;
-        this.yPercent = knobPercentY;
-        this.speed = 1.5 * speed;
+
+        //find angle so we can normalize speed of bullet
+        this.angle = Math.atan2(knobPercentY, knobPercentX);
+
+        this.yPercent = Math.sin(this.angle);
+        this.xPercent = Math.cos(this.angle);
 
 
         width = height = 10;
