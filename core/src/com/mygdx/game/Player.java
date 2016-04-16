@@ -2,43 +2,28 @@ package com.mygdx.game;
 
 import java.util.ArrayList;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.math.MathUtils;
 
 public class Player extends GameObject {
 
     private final int MAX_BULLETS = 1;
     public ArrayList<Bullet> bullets;
 
-    private float[] flamex;
-    private float[] flamey;
-
-    private boolean left;
-    private boolean right;
-    private boolean up;
-
-    private float maxSpeed;
-    private float acceleration;
-    private float deceleration;
-    private float acceleratingTimer;
-
-    private float game_width = Gdx.graphics.getWidth();
-    private float game_height = Gdx.graphics.getHeight();
+    private final float GAME_WIDTH = Gdx.graphics.getWidth();
+    private final float GAME_HEIGHT = Gdx.graphics.getHeight();
 
     public Texture blockTexture;
     public Sprite blockSprite;
     public float blockSpeed;
 
-    private float lastNonZeroDx = (float) .5;
-    private float lastNonZeroDy = (float) .5;
+    private float lastNonZeroDx = .5f;
+    private float lastNonZeroDy = .5f;
 
     private ShapeRenderer shapeRenderer;
 
@@ -49,23 +34,24 @@ public class Player extends GameObject {
 
         this.bullets = bullets;
 
-//        x = game_width / 2;
-//        y = game_height / 2;
-
         //Create block sprite
         blockTexture = new Texture(Gdx.files.internal("block.png"));
         blockSprite = new Sprite(blockTexture);
         //Set position to centre of the screen
-        blockSprite.setPosition(Gdx.graphics.getWidth() / 2 - blockSprite.getWidth() / 2, Gdx.graphics.getHeight() / 2 - blockSprite.getHeight() / 2);
+        blockSprite.setPosition(GAME_WIDTH / 2 - blockSprite.getWidth() / 2, GAME_HEIGHT / 2 - blockSprite.getHeight() / 2);
 
         blockSpeed = 5;
 
         this.shapeRenderer = shapeRenderer;
     }
 
-    public void shoot() {
-        if(bullets.size() == MAX_BULLETS) return;
-        bullets.add(new Bullet(blockSprite.getX(), blockSprite.getY(), lastNonZeroDx, lastNonZeroDy));
+    public boolean shoot() {
+        if(bullets.size() == MAX_BULLETS) {
+            return false;
+        } else {
+            bullets.add(new Bullet(blockSprite.getX(), blockSprite.getY(), lastNonZeroDx, lastNonZeroDy));
+            return true;
+        }
     }
 
     public void update(float dt, float knobPercentX, float knobPercentY) {
@@ -74,13 +60,13 @@ public class Player extends GameObject {
         blockSprite.setY(blockSprite.getY() + knobPercentY * blockSpeed);
         if (blockSprite.getX() < 0) {
             blockSprite.setX(0);
-        } else if (blockSprite.getX() > Gdx.graphics.getWidth() - blockTexture.getWidth()) {
-            blockSprite.setX(Gdx.graphics.getWidth() - blockTexture.getWidth());
+        } else if (blockSprite.getX() > GAME_WIDTH - blockTexture.getWidth()) {
+            blockSprite.setX(GAME_WIDTH - blockTexture.getWidth());
         }
         if (blockSprite.getY() < 0) {
             blockSprite.setY(0);
-        } else if (blockSprite.getY() > Gdx.graphics.getHeight() - blockTexture.getHeight()) {
-            blockSprite.setY(Gdx.graphics.getHeight() - blockTexture.getHeight());
+        } else if (blockSprite.getY() > GAME_HEIGHT - blockTexture.getHeight()) {
+            blockSprite.setY(GAME_HEIGHT - blockTexture.getHeight());
         }
 
         if (0 != knobPercentX && 0 != knobPercentY) {
@@ -96,10 +82,6 @@ public class Player extends GameObject {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.circle((float) (blockSprite.getX() + shiftx), (float) (blockSprite.getY() + shifty), 200);
         shapeRenderer.end();
-
-        // screen wrap
-        //wrap();
-
     }
 
     public void draw(Batch batch) {

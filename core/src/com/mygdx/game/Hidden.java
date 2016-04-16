@@ -5,12 +5,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -23,9 +20,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.utils.viewport.Viewport;
-import com.mygdx.game.Player;
-import com.mygdx.game.Bullet;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -74,6 +68,9 @@ public class Hidden extends ApplicationAdapter {
 
     //Socket socket;
 
+    //Variable to slow down fire rate
+    boolean canShoot;
+
 	@Override
 	public void create () {
         bgMusic = Gdx.audio.newMusic(Gdx.files.internal("mus_bg.ogg"));
@@ -120,13 +117,13 @@ public class Hidden extends ApplicationAdapter {
         fireBtnStyle.down = fireSkin.getDrawable("btnpressed");
         fireBtn = new ImageButton(fireBtnStyle);
         fireBtn.setBounds(Gdx.graphics.getWidth() - 150, 50, 100, 100);
+        canShoot = true;
+        fireSkin.dispose();
 
         //Create a Stage and add TouchPad
         stage = new Stage();
-        //Use batch????????
+        //TODO:Use batch????????
         stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
-        stage.addActor(touchpad);
-        stage.addActor(fireBtn);
         Gdx.input.setInputProcessor(stage);
 
         //Create block sprite
@@ -236,22 +233,30 @@ public class Hidden extends ApplicationAdapter {
 
 
         if (fireBtn.isPressed()) {
-            player.shoot();
-            shootSound.play();
+            if (canShoot) {
+                if (player.shoot()) {
+                    shootSound.play();
+                }
+            }
+            canShoot = false;
+        } else {
+            canShoot = true;
         }
 
         if (start) {
             //Draw splash screen
-            batch = new SpriteBatch();
             batch.begin();
             batch.draw(ttrSplash, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             batch.end();
             stage.draw();
             if (Gdx.input.isTouched()) {
                 start = false;
+                ttrSplash.dispose();
             }
         } else {
-
+            //Add actors
+            stage.addActor(touchpad);
+            stage.addActor(fireBtn);
             //Draw
             batch.begin();
             for(Player p : players) {
@@ -292,6 +297,11 @@ public class Hidden extends ApplicationAdapter {
         shootSound.dispose();
         hitSound.dispose();
         damageSound.dispose();
+        ttrSplash.dispose();
+        stage.dispose();
+        batch.dispose();
+        shapeRenderer.dispose();
+        touchpadSkin.dispose();
     }
 
     @Override
