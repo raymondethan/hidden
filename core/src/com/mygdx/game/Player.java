@@ -106,6 +106,16 @@ public class Player extends GameObject {
 
         blockSprite.setX(blockSprite.getX() + knobPercentX * blockSpeed);
         blockSprite.setY(blockSprite.getY() + knobPercentY * blockSpeed);
+        if (blockSprite.getX() < 0) {
+            blockSprite.setX(0);
+        } else if (blockSprite.getX() > Gdx.graphics.getWidth() - blockTexture.getWidth()) {
+            blockSprite.setX(Gdx.graphics.getWidth() - blockTexture.getWidth());
+        }
+        if (blockSprite.getY() < 0) {
+            blockSprite.setY(0);
+        } else if (blockSprite.getY() > Gdx.graphics.getHeight() - blockTexture.getHeight()) {
+            blockSprite.setY(Gdx.graphics.getHeight() - blockTexture.getHeight());
+        }
 
         if (0 != knobPercentX && 0 != knobPercentY) {
             lastNonZeroDx = knobPercentX;
