@@ -1,20 +1,12 @@
 package com.mygdx.game;
 
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.math.MathUtils;
 
 public class Bullet extends GameObject {
 
-    private float lifeTime;
-    private float lifeTimer;
-
     private float game_width = Gdx.graphics.getWidth();
     private float game_height = Gdx.graphics.getHeight();
-
-    private boolean remove;
 
     private double xPercent;
     private double yPercent;
@@ -32,12 +24,7 @@ public class Bullet extends GameObject {
         this.yPercent = Math.sin(this.angle);
         this.xPercent = Math.cos(this.angle);
 
-
         width = height = 10;
-
-//        lifeTimer = 0;
-//        lifeTime = 500;
-
     }
 
     public boolean shouldRemove() { return this.x > game_width || this.y > game_height || this.x < 0 || this.y < 0; }
@@ -50,21 +37,8 @@ public class Bullet extends GameObject {
     }
 
     public void update(float dt) {
-
         x += xPercent * speed;
         y += yPercent * speed;
-
-//        System.out.println("--------------------------------- X PERCENT: " + xPercent);
-//        System.out.println("--------------------------------- Y PERCENT: " + yPercent);
-//        System.out.println(speed);
-
-        //wrap();
-
-//        lifeTimer += dt;
-//        if(lifeTimer > lifeTime) {
-//            remove = true;
-//        }
-
     }
 
     public void draw(ShapeRenderer sr) {
@@ -73,5 +47,4 @@ public class Bullet extends GameObject {
         sr.circle(x - width / 2, y - height / 2, width / 2);
         sr.end();
     }
-
 }
