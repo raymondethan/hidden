@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Net;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
@@ -13,6 +14,10 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.net.ServerSocket;
+import com.badlogic.gdx.net.ServerSocketHints;
+import com.badlogic.gdx.net.Socket;
+import com.badlogic.gdx.net.SocketHints;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -22,7 +27,17 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.Player;
 import com.mygdx.game.Bullet;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
 
 
 public class Hidden extends ApplicationAdapter {
@@ -51,6 +66,13 @@ public class Hidden extends ApplicationAdapter {
 
     private boolean start = true;
     private Texture ttrSplash;
+
+    private String ipAddress;
+    private ArrayList<Player> players = new ArrayList<Player>();
+
+    SocketHints socketHints = new SocketHints();
+
+    //Socket socket;
 
 	@Override
 	public void create () {
@@ -108,12 +130,98 @@ public class Hidden extends ApplicationAdapter {
         Gdx.input.setInputProcessor(stage);
 
         //Create block sprite
-        ArrayList<Bullet> bullets = new ArrayList<Bullet>();
+        final ArrayList<Bullet> bullets = new ArrayList<Bullet>();
         player = new Player(bullets, shapeRenderer);
+        players.add(player);
 
         //Play music
         bgMusic.setLooping(true);
         //bgMusic.play();
+
+        // The following code loops through the available network interfaces
+        // Keep in mind, there can be multiple interfaces per device, for example
+        // one per NIC, one per active wireless and the loopback
+        // In this case we only care about IPv4 address ( x.x.x.x format )
+        List<String> addresses = new ArrayList<String>();
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            for(NetworkInterface ni : Collections.list(interfaces)){
+                for(InetAddress address : Collections.list(ni.getInetAddresses()))
+                {
+                    if(address instanceof Inet4Address){
+                        addresses.add(address.getHostAddress());
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+
+        // Print the contents of our array to a string.  Yeah, should have used StringBuilder
+        for(String str:addresses)
+        {
+            if (str.startsWith("10")) {
+                this.ipAddress = str;
+            }
+        }
+        System.out.println("adddr: " + ipAddress);
+
+        // Socket will time our in 4 seconds
+        socketHints.connectTimeout = 4000;
+
+        // Now we create a thread that will listen for incoming socket connections
+        new Thread(new Runnable(){
+
+            @Override
+            public void run() {
+                ServerSocketHints serverSocketHint = new ServerSocketHints();
+                // 0 means no timeout.  Probably not the greatest idea in production!
+                serverSocketHint.acceptTimeout = 0;
+
+                // Create the socket server using TCP protocol and listening on 9021
+                // Only one app can listen to a port at a time, keep in mind many ports are reserved
+                // especially in the lower numbers ( like 21, 80, etc )
+                ServerSocket serverSocket = Gdx.net.newServerSocket(Net.Protocol.TCP, 9021, serverSocketHint);
+
+                // Loop forever
+                while(true){
+                    // Create a socket
+                    Socket socket = serverSocket.accept(null);
+
+                    // Read data from the socket into a BufferedReader
+                    BufferedReader buffer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+                    if (null != buffer) {
+
+                        try {
+                            // Read to the next newline (\n) and display that text on labelMessage
+                            System.out.println("butter: " + buffer);
+                            String[] data = buffer.readLine().split(",");
+                            System.out.println("data" + data.toString());
+                            System.out.println(Float.parseFloat(data[0]));
+                            System.out.println(Float.parseFloat(data[1]));
+                            if (players.size() == 1) {
+                                Player p = new Player(new ArrayList<Bullet>(), shapeRenderer);
+                                System.out.println("Player: " + p);
+                                p.setPosition(Float.parseFloat(data[0]), Float.parseFloat(data[1]));
+                                players.add(p);
+                            } else {
+                                players.get(1).setPosition(Float.parseFloat(data[0]), Float.parseFloat(data[1]));
+                            }
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }).start(); // And, start the thread running
+
+        //create the socket and connect to the server entered in the text box ( x.x.x.x format ) on port 9021
+//        if (!this.ipAddress.equals("10.89.37.19")) {
+//            socket = Gdx.net.newClientSocket(Net.Protocol.TCP, "10.89.37.19", 9021, socketHints);
+//        }
+
 	}
 
     @Override
@@ -125,6 +233,7 @@ public class Hidden extends ApplicationAdapter {
 
         //Move blockSprite with TouchPad
         player.update(1, touchpad.getKnobPercentX(), touchpad.getKnobPercentY());
+
 
         if (fireBtn.isPressed()) {
             player.shoot();
@@ -145,7 +254,9 @@ public class Hidden extends ApplicationAdapter {
 
             //Draw
             batch.begin();
-            player.blockSprite.draw(batch);
+            for(Player p : players) {
+                p.draw(batch);
+            }
             batch.end();
             // update player bullets
             for (int i = 0; i < player.bullets.size(); i++) {
@@ -159,6 +270,19 @@ public class Hidden extends ApplicationAdapter {
             stage.act(Gdx.graphics.getDeltaTime());
             stage.draw();
 
+        }
+        if (!"10.89.37.19".equals(this.ipAddress)) {
+
+            Socket socket = Gdx.net.newClientSocket(Net.Protocol.TCP, "10.89.37.19", 9021, socketHints);
+            System.out.println(player.blockSprite.getX());
+            System.out.println(player.blockSprite.getY());
+
+            try {
+                // write our entered message to the stream
+                socket.getOutputStream().write((player.blockSprite.getX() + "," + player.blockSprite.getY()).getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -14,7 +15,7 @@ import com.badlogic.gdx.math.MathUtils;
 
 public class Player extends GameObject {
 
-    private final int MAX_BULLETS = 4;
+    private final int MAX_BULLETS = 1;
     public ArrayList<Bullet> bullets;
 
     private float[] flamex;
@@ -101,35 +102,13 @@ public class Player extends GameObject {
 
     }
 
-    public void draw(ShapeRenderer sr) {
+    public void draw(Batch batch) {
+        blockSprite.draw(batch);
+    }
 
-        sr.setColor(1, 1, 1, 1);
-
-        sr.begin(ShapeType.Line);
-
-        // draw ship
-        for(int i = 0, j = shapex.length - 1;
-            i < shapex.length;
-            j = i++) {
-
-            sr.line(shapex[i], shapey[i], shapex[j], shapey[j]);
-
-        }
-
-        // draw flames
-        if(up) {
-            for(int i = 0, j = flamex.length - 1;
-                i < flamex.length;
-                j = i++) {
-
-                sr.line(flamex[i], flamey[i], flamex[j], flamey[j]);
-
-            }
-        }
-
-
-        sr.end();
-
+    public void setPosition(float x, float y) {
+        blockSprite.setX(x);
+        blockSprite.setY(y);
     }
 
 }
