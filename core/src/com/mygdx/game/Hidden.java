@@ -36,8 +36,7 @@ import java.util.List;
 
 public class Hidden extends ApplicationAdapter {
 	SpriteBatch batch;
-	Texture img;
-	ShapeRenderer shapeRenderer;
+    ShapeRenderer shapeRenderer;
 	Touchpad touchpad;
     private OrthographicCamera camera;
     private Stage stage;
@@ -106,12 +105,10 @@ public class Hidden extends ApplicationAdapter {
         touchpadStyle.knob = (com.badlogic.gdx.scenes.scene2d.utils.Drawable) touchKnob;
         //Create new TouchPad with the created style
         touchpad = new Touchpad(10, touchpadStyle);
-        //setBounds(x,y,width,height)
         touchpad.setBounds(15, 15, 250, 250);
 
         //Fire button
         fireSkin = new Skin();
-        //fireSkin.add("fireButton", new Texture("btnunpressed.png"));
         buttonAtlas = new TextureAtlas(Gdx.files.internal("fire.atlas"));
         fireSkin.addRegions(buttonAtlas);
         fireBtnStyle = new ImageButton.ImageButtonStyle();
@@ -302,6 +299,7 @@ public class Hidden extends ApplicationAdapter {
         hitSound.dispose();
         damageSound.dispose();
         ttrSplash.dispose();
+        bg.dispose();
         stage.dispose();
         batch.dispose();
         shapeRenderer.dispose();
