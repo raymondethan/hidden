@@ -12,8 +12,10 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 
 public class Player extends GameObject {
 
+    public int health = 100;
     private final int MAX_BULLETS = 1;
     public ArrayList<Bullet> bullets;
+    public ArrayList<Bullet> enemyBullets;      //Will need to be populated through socket
 
     private final float GAME_WIDTH = Gdx.graphics.getWidth();
     private final float GAME_HEIGHT = Gdx.graphics.getHeight();
@@ -60,6 +62,20 @@ public class Player extends GameObject {
     }
 
     public void update(float dt, float knobPercentX, float knobPercentY, boolean isTouched) {
+
+        //Check for bullet collisions
+        for (int c = 0; c < enemyBullets.size(); c++) {
+            if (enemyBullets.get(c).x > blockSprite.getX() - blockTexture.getWidth() / 2 && enemyBullets.get(c).x < blockSprite.getX() + blockTexture.getWidth() / 2) {
+                if (enemyBullets.get(c).y > blockSprite.getY() - blockTexture.getHeight() / 2 && enemyBullets.get(c).y < blockSprite.getY() + blockTexture.getWidth() / 2) {
+                    health -= 25;
+                    enemyBullets.remove(c);
+                }
+            }
+        }
+
+        if (health <= 0) {
+            //Handle game loss here
+        }
 
         blockSprite.setX(blockSprite.getX() + knobPercentX * blockSpeed);
         blockSprite.setY(blockSprite.getY() + knobPercentY * blockSpeed);
