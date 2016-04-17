@@ -65,12 +65,15 @@ public class Player extends GameObject {
 
         //Check for bullet collisions
         for (int c = 0; c < enemyBullets.size(); c++) {
-            if (enemyBullets.get(c).x > blockSprite.getX() - blockTexture.getWidth() / 2 && enemyBullets.get(c).x < blockSprite.getX() + blockTexture.getWidth() / 2) {
-                if (enemyBullets.get(c).y > blockSprite.getY() - blockTexture.getHeight() / 2 && enemyBullets.get(c).y < blockSprite.getY() + blockTexture.getWidth() / 2) {
-                    health -= 25;
-                    enemyBullets.remove(c);
-                }
+            Bullet b = enemyBullets.get(c);
+            if (b.x > blockSprite.getX() - blockTexture.getWidth() / 2 && b.x < blockSprite.getX() + blockTexture.getWidth() / 2
+                    && b.y > blockSprite.getY() - blockTexture.getHeight() / 2 && b.y < blockSprite.getY() + blockTexture.getWidth() / 2) {
+                health -= 25;
+                enemyBullets.remove(c);
+            } else {
+                b.update(1);
             }
+
         }
 
         if (health <= 0) {
