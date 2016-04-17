@@ -86,6 +86,7 @@ public class Player extends GameObject {
             lastNonZeroDx = knobPercentX;
             lastNonZeroDy = knobPercentY;
         }
+        //wtf is this
         if (Math.random() < .025) {
             shiftx = Math.random() * 120 - 60;
             shifty = Math.random() * 120 - 60;

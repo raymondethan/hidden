@@ -60,6 +60,7 @@ public class Hidden extends ApplicationAdapter {
 
     private boolean start = true;
     private Texture ttrSplash;
+    private Texture bg;
 
     private String ipAddress;
     private ArrayList<Player> players = new ArrayList<Player>();
@@ -82,6 +83,7 @@ public class Hidden extends ApplicationAdapter {
 		batch = new SpriteBatch();
 
         ttrSplash = new Texture("splash-screen.png");
+        bg = new Texture("bg.jpg");
 
         //Create camera
         float aspectRatio = (float) Gdx.graphics.getWidth() / (float) Gdx.graphics.getHeight();
@@ -133,7 +135,7 @@ public class Hidden extends ApplicationAdapter {
 
         //Play music
         bgMusic.setLooping(true);
-        //bgMusic.play();
+        bgMusic.play();
 
 //        // The following code loops through the available network interfaces
 //        // Keep in mind, there can be multiple interfaces per device, for example
@@ -259,6 +261,7 @@ public class Hidden extends ApplicationAdapter {
             stage.addActor(fireBtn);
             //Draw
             batch.begin();
+            batch.draw(bg, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             for(Player p : players) {
                 p.draw(batch);
             }
@@ -341,7 +344,7 @@ public class Hidden extends ApplicationAdapter {
                     }
                 }
             }
-        } catch (Exception ex) { } // for now eat exceptions
+        } catch (Exception ex) { }
         return "";
     }
 
